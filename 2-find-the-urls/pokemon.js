@@ -69,6 +69,7 @@ function fetchPoke(URL) {
       assert.strictEqual(data.base_experience, 62);
 
       console.log('The Id for this solution is ' + data.id);
+      log('The Id for this solution is ' + data.id);
       log('... PASS!');
       process.exit(0)
     })

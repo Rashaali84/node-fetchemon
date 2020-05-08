@@ -69,6 +69,7 @@ async function main(URL) {
     assert.strictEqual(data.fling_effect, null);
     assert.strictEqual(data.baby_trigger_for, null);
     console.log('Id of the item is :' + data.id);
+    log('Id of the item is :' + data.id);
     log('... PASS!');
     process.exit(0);
 

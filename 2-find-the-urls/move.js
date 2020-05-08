@@ -72,7 +72,7 @@ async function main(URL) {
     assert.strictEqual(data.power, null);
 
     console.log('Id of the Move solution is ' + data.id);
-
+    log('Id of the Move solution is ' + data.id);
     log('... PASS!');
     process.exit(0);
 

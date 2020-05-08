@@ -69,7 +69,8 @@ async function main(URL) {
         assert.strictEqual(data.pokemon.length, 44);
         assert.strictEqual(data.moves.length, 25);
 
-        console.log('solution is type Id =' + data.id)
+        console.log('solution is type Id =' + data.id);
+        log('solution is type Id =' + data.id);
         log('... PASS!');
         process.exit(0);
       })
