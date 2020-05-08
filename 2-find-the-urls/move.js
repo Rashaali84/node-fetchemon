@@ -47,11 +47,11 @@ log((new Date()).toLocaleString());
 // --- begin main script ---
 
 
-const URL = 'https://pokeapi.co/api/v2/_';
+//const URL = 'https://pokeapi.co/api/v2/move/103/';
+//solution is 
+//https://pokeapi.co/api/v2/move/103/
 
-
-
-(async () => {
+async function main(URL) {
   try {
     log('fetching ' + URL + ' ...');
     const dotDotDot = setInterval(() => log('...'), 100);
@@ -71,10 +71,33 @@ const URL = 'https://pokeapi.co/api/v2/_';
     assert.strictEqual(data.priority, 0);
     assert.strictEqual(data.power, null);
 
+    console.log('Id of the Move solution is ' + data.id);
+
     log('... PASS!');
+    process.exit(0);
 
   } catch (err) {
     log(err.stack);
   };
-})();
+};
 
+async function search(data) {
+  console.log(data.results);
+
+  await data.results.forEach(element => {
+    main(element.url);
+  });
+
+}
+
+async function searchTillFound(offst, limit) {
+  const res = await nodeFetch(`https://pokeapi.co/api/v2/move/?offset=${offst}&limit=${limit}`);
+  let data = await res.json();
+  while (search(data)) {
+    const resInLoop = await nodeFetch(data.next);
+    data = await resInLoop.json();
+  }
+}
+searchTillFound(0, 10);
+//solution is :D !
+//https://pokeapi.co/api/v2/move/103/

@@ -45,10 +45,44 @@ log((new Date()).toLocaleString());
 
 
 // --- begin main script ---
+//using promises instead of async/await 
 
+function fetchDataPromise(URL) {
+  return new Promise((resolve, reject) => {
+    log('fetching ' + URL + ' ...');
+    nodeFetch(URL).then((data) => {
+      clearInterval(dotDotDot);
+      log('testing response ...');
+      assert.strictEqual(data.ok, true);
+      assert.strictEqual(data.status, 200);
+      log('parsing response ...');
+      return resolve(data.json());
+    }).catch((err) => { return reject(err) });
+  });
+}
+const main = (URL) => {
+  fetchDataPromise(URL).then((data) => {
+    log('testing data ...');
+    assert.strictEqual(data.name, 'butterfree');
+    assert.strictEqual(data.id, 12);
+    assert.deepStrictEqual(data.species, {
+      name: "butterfree",
+      url: "https://pokeapi.co/api/v2/pokemon-species/12/"
+    });
+    assert.deepStrictEqual(data.forms, [
+      {
+        name: "butterfree",
+        url: "https://pokeapi.co/api/v2/pokemon-form/12/"
+      }
+    ]);
+    log('... PASS!');
+  }).catch(err => log(err.stack));
 
+}
+const dotDotDot = setInterval(() => log('...'), 100);
+main('https://pokeapi.co/api/v2/pokemon/butterfree');
 
-const main = async (URL) => {
+/*const main = async (URL) => {
   try {
     log('fetching ' + URL + ' ...');
     const dotDotDot = setInterval(() => log('...'), 100);
@@ -81,7 +115,7 @@ const main = async (URL) => {
   } catch (err) {
     log(err.stack);
   };
-};
+};*/
+//main('https://pokeapi.co/api/v2/pokemon/butterfree');
 
-main('https://pokeapi.co/api/v2/pokemon/butterfree');
 

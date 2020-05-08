@@ -46,9 +46,55 @@ log((new Date()).toLocaleString());
 
 // --- begin main script ---
 
+//the pokemon who's next evolution is named Starmie
+//solution for this exercise 
+//https://pokeapi.co/api/v2/pokemon-species/120
+function fetchPoke(URL) {
+  log('fetching ' + URL + ' ...');
+  nodeFetch(URL)
+    .then(res => {
+      clearInterval(dotDotDot);
 
-// the pokemon who's next evolution is named Starmie
+      log('testing response ...');
+      assert.strictEqual(res.ok, true);
+      assert.strictEqual(res.status, 200);
 
+      log('parsing response ...');
+      return res.json()
+    })
+    .then(data => {
+      log('testing data ...');
 
+      assert.equal(data.name, "starmie");
+      var id = parseInt(data.id);
+      id = id - 1;
+      console.log(id);
+      console.log('The Id for this solution is  ' + id);
+      log('The Id for this solution is  ' + id);
+      log('... PASS!');
+      process.exit(0)
+    })
+    .catch(err => log(err.stack));
+
+}
+async function search(data) {
+  //console.log(data.results);
+
+  await data.results.forEach(element => {
+    fetchPoke(element.url);
+  });
+
+}
+
+async function searchTillFound(offst, limit) {
+  const res = await nodeFetch(`https://pokeapi.co/api/v2/pokemon-species/?offset=${offst}&limit=${limit}`);
+  let data = await res.json();
+  while (search(data)) {
+    const resInLoop = await nodeFetch(data.next);
+    data = await resInLoop.json();
+  }
+}
+const dotDotDot = setInterval(() => log('...'), 100);
+searchTillFound(0, 10);
 
 

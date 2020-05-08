@@ -45,9 +45,39 @@ log((new Date()).toLocaleString());
 
 
 // --- begin main script ---
+const URL = 'https://pokeapi.co/api/v2/pokemon/84';
+const main = async (URL) => {
+  try {
+    log('fetching ' + URL + ' ...');
+    const res = await nodeFetch(URL);
+    const dotDotDot = setInterval(() => log('...'), 100);
+    clearInterval(dotDotDot);
+
+    log('testing response ...');
+    assert.strictEqual(res.ok, true);
+    assert.strictEqual(res.status, 200);
+
+    log('parsing response ...');
+    data = await res.json();
+    clearInterval(dotDotDot);
+
+    log('testing data ...');
+    assert.strictEqual(data.name, 'doduo');
+    assert.strictEqual(data.weight, 392);
+    assert.deepStrictEqual(data.held_items[0].item, {
+      name: "sharp-beak",
+      url: "https://pokeapi.co/api/v2/item/221/"
+    });
+    log('... PASS!');
+  }
+  catch (err) { log(err.stack); };
+};
+
+main(URL);
 
 
 
+/*
 const URL = 'https://pokeapi.co/api/v2/pokemon/84';
 
 
@@ -77,5 +107,5 @@ nodeFetch(URL)
   .catch(err => log(err.stack));
 
 
-const dotDotDot = setInterval(() => log('...'), 100);
+const dotDotDot = setInterval(() => log('...'), 100);*/
 

@@ -47,5 +47,56 @@ log((new Date()).toLocaleString());
 // --- begin main script ---
 
 // the type with 28 moves, 7 names, and 72 items
+//solution is url = `https://pokeapi.co/api/v2/type/4/`;
 
+async function main(URL) {
+  try {
+    log('fetching ' + URL + ' ...');
+    await nodeFetch(URL)
+      .then(res => {
+        clearInterval(dotDotDot);
 
+        log('testing response ...');
+        assert.strictEqual(res.ok, true);
+        assert.strictEqual(res.status, 200);
+
+        log('parsing response ...');
+        return res.json()
+      })
+      .then(data => {
+        log('testing data ...');
+        // the type with 28 moves, 7 names, and 72 items
+        //count items 
+        let totalItemsCount = 0;
+        Object.keys(data).forEach((key) => {
+          if (!['name', 'id'].includes(key))
+            totalItemsCount = + data[key].length;
+        });
+        assert.strictEqual(totalItemsCount, 72);
+        assert.strictEqual(data.names.length, 7);
+        assert.strictEqual(data.moves.length, 28);
+
+        console.log('solution is type Id =' + data.id);
+        log('solution is type Id =' + data.id);
+        log('... PASS!');
+        process.exit(0);
+      })
+  } catch (err) { log(err.stack) };
+
+}
+
+async function searchTillFound() {
+
+  for (let i = 1; i <= 18; i++) {
+    let url = `https://pokeapi.co/api/v2/type/${i}/`;
+    await main(url);
+  }
+  //10001 10002
+  for (let i = 10001; i <= 10002; i++) {
+    let url = `https://pokeapi.co/api/v2/type/${i}/`;
+    await main(url);
+  }
+}
+
+const dotDotDot = setInterval(() => log('...'), 100);
+searchTillFound();

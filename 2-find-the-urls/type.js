@@ -46,32 +46,51 @@ log((new Date()).toLocaleString());
 
 // --- begin main script ---
 
+//Solution is .... URL=https://pokeapi.co/api/v2/type/15/
+//const URL = 'https://pokeapi.co/api/v2/type/15/';
 
-const URL = 'https://pokeapi.co/api/v2/_';
+async function main(URL) {
+  try {
+    log('fetching ' + URL + ' ...');
+    await nodeFetch(URL)
+      .then(res => {
+        clearInterval(dotDotDot);
 
+        log('testing response ...');
+        assert.strictEqual(res.ok, true);
+        assert.strictEqual(res.status, 200);
 
-log('fetching ' + URL + ' ...');
-nodeFetch(URL)
-  .then(res => {
-    clearInterval(dotDotDot);
+        log('parsing response ...');
+        return res.json()
+      })
+      .then(data => {
+        log('testing data ...');
+        assert.strictEqual(Object.keys(data.damage_relations).length, 6);
+        assert.strictEqual(data.pokemon.length, 44);
+        assert.strictEqual(data.moves.length, 25);
 
-    log('testing response ...');
-    assert.strictEqual(res.ok, true);
-    assert.strictEqual(res.status, 200);
+        console.log('solution is type Id =' + data.id)
+        log('... PASS!');
+        process.exit(0);
+      })
+  } catch (err) { log(err.stack) };
 
-    log('parsing response ...');
-    return res.json()
-  })
-  .then(data => {
-    log('testing data ...');
-    assert.strictEqual(Object.keys(data.damage_relations).length, 6);
-    assert.strictEqual(data.pokemon.length, 44);
-    assert.strictEqual(data.moves.length, 25);
+}
 
-    log('... PASS!');
-  })
-  .catch(err => log(err.stack));
+async function searchTillFound() {
 
+  for (let i = 1; i <= 18; i++) {
+    let url = `https://pokeapi.co/api/v2/type/${i}/`;
+    await main(url);
+  }
+  //10001 10002
+  for (let i = 10001; i <= 10002; i++) {
+    let url = `https://pokeapi.co/api/v2/type/${i}/`;
+    await main(url);
+  }
+}
 
 const dotDotDot = setInterval(() => log('...'), 100);
+searchTillFound();
 
+//Solution is .... URL=https://pokeapi.co/api/v2/type/15/

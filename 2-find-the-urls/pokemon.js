@@ -46,31 +46,54 @@ log((new Date()).toLocaleString());
 
 // --- begin main script ---
 
+//solution is 
+//const URL = 'https://pokeapi.co/api/v2/pokemon/92';
 
-const URL = 'https://pokeapi.co/api/v2/_';
+function fetchPoke(URL) {
+  log('fetching ' + URL + ' ...');
+  nodeFetch(URL)
+    .then(res => {
+      clearInterval(dotDotDot);
 
+      log('testing response ...');
+      assert.strictEqual(res.ok, true);
+      assert.strictEqual(res.status, 200);
 
-log('fetching ' + URL + ' ...');
-nodeFetch(URL)
-  .then(res => {
-    clearInterval(dotDotDot);
+      log('parsing response ...');
+      return res.json()
+    })
+    .then(data => {
+      log('testing data ...');
+      assert.strictEqual(data.height, 13);
+      assert.strictEqual(data.weight, 1);
+      assert.strictEqual(data.base_experience, 62);
 
-    log('testing response ...');
-    assert.strictEqual(res.ok, true);
-    assert.strictEqual(res.status, 200);
+      console.log('The Id for this solution is ' + data.id);
+      log('... PASS!');
+      process.exit(0)
+    })
+    .catch(err => log(err.stack));
 
-    log('parsing response ...');
-    return res.json()
-  })
-  .then(data => {
-    log('testing data ...');
-    assert.strictEqual(data.height, 13);
-    assert.strictEqual(data.weight, 1);
-    assert.strictEqual(data.base_experience, 62);
+}
+async function search(data) {
+  console.log(data.results);
 
-    log('... PASS!');
-  })
-  .catch(err => log(err.stack));
+  await data.results.forEach(element => {
+    fetchPoke(element.url);
+  });
 
+}
 
+async function searchTillFound(offst, limit) {
+  const res = await nodeFetch(`https://pokeapi.co/api/v2/pokemon/?offset=${offst}&limit=${limit}`);
+  let data = await res.json();
+  while (search(data)) {
+    const resInLoop = await nodeFetch(data.next);
+    data = await resInLoop.json();
+  }
+}
 const dotDotDot = setInterval(() => log('...'), 100);
+searchTillFound(0, 10);
+
+//Solution is :D  'https://pokeapi.co/api/v2/pokemon/92'
+

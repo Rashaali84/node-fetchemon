@@ -47,8 +47,44 @@ log((new Date()).toLocaleString());
 // --- begin main script ---
 
 
+function fetchDataPromise(URL) {
+  return new Promise((resolve, reject) => {
+    log('fetching ' + URL + ' ...');
+    nodeFetch(URL).then((data) => {
+      clearInterval(dotDotDot);
+      log('testing response ...');
+      assert.strictEqual(data.ok, true);
+      assert.strictEqual(data.status, 200);
+      log('parsing response ...');
+      return resolve(data.json());
+    }).catch((err) => { return reject(err) });
+  });
+}
+const main = (URL) => {
+  fetchDataPromise(URL).then((data) => {
+    log('testing data ...');
+    assert.strictEqual(data.name, 'raticate');
+    assert.strictEqual(data.id, 20);
+    assert.strictEqual(data.height, 7);
+    assert.deepStrictEqual(data.abilities[2], {
+      ability: {
+        name: "run-away",
+        url: "https://pokeapi.co/api/v2/ability/50/"
+      },
+      is_hidden: false,
+      slot: 1
+    });
 
-const URL = 'https://pokeapi.co/api/v2/pokemon/20';
+    log('... PASS!');
+
+  }).catch(err => log(err.stack));
+
+}
+const dotDotDot = setInterval(() => log('...'), 100);
+main('https://pokeapi.co/api/v2/pokemon/20');
+
+
+/*const URL = 'https://pokeapi.co/api/v2/pokemon/20';
 
 
 
@@ -84,5 +120,5 @@ const URL = 'https://pokeapi.co/api/v2/pokemon/20';
   } catch (err) {
     log(err.stack);
   };
-})();
+})();*/
 

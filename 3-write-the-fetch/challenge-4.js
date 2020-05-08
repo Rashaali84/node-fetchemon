@@ -47,5 +47,53 @@ log((new Date()).toLocaleString());
 // --- begin main script ---
 
 // the pokemon who's previous evolution is "Meowth"
+//const URL = 'https://pokeapi.co/api/v2/pokemon-species/53';
+
+function fetchPoke(URL) {
+  log('fetching ' + URL + ' ...');
+  nodeFetch(URL)
+    .then(res => {
+      clearInterval(dotDotDot);
+
+      log('testing response ...');
+      assert.strictEqual(res.ok, true);
+      assert.strictEqual(res.status, 200);
+
+      log('parsing response ...');
+      return res.json()
+    })
+    .then(data => {
+      log('testing data ...');
+
+      //the pokemon who's previous evolution is "Meowth"
+      assert.equal(data.evolves_from_species.name, "meowth");
+      console.log('The Id for this solution is ' + data.id);
+      log('The Id for this solution is ' + data.id);
+      log('... PASS!');
+      process.exit(0)
+    })
+    .catch(err => log(err.stack));
+
+}
+async function search(data) {
+  //console.log(data.results);
+
+  await data.results.forEach(element => {
+    fetchPoke(element.url);
+  });
+
+}
+
+async function searchTillFound(offst, limit) {
+  const res = await nodeFetch(`https://pokeapi.co/api/v2/pokemon-species/?offset=${offst}&limit=${limit}`);
+  let data = await res.json();
+  while (search(data)) {
+    const resInLoop = await nodeFetch(data.next);
+    data = await resInLoop.json();
+  }
+}
+const dotDotDot = setInterval(() => log('...'), 100);
+searchTillFound(0, 10);
 
 
+//doesn't exist 

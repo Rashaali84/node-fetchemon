@@ -45,11 +45,11 @@ log((new Date()).toLocaleString());
 
 
 // --- begin main script ---
+//solution https://pokeapi.co/api/v2/item/23/
 
-
-
-const main = async (URL) => {
+async function main(URL) {
   try {
+    console.log(URL);
     log('fetching ' + URL + ' ...');
     const dotDotDot = setInterval(() => log('...'), 100);
     const res = await nodeFetch(URL);
@@ -61,19 +61,39 @@ const main = async (URL) => {
 
     log('parsing response ...');
     const data = await res.json();
+    console.log(data);
 
     log('testing data ...');
     assert.strictEqual(data.cost, 3000);
     assert.strictEqual(data.fling_power, 30);
     assert.strictEqual(data.fling_effect, null);
     assert.strictEqual(data.baby_trigger_for, null);
-
+    console.log('Id of the item is :' + data.id);
     log('... PASS!');
+    process.exit(0);
 
   } catch (err) {
-    log(err.stack);
+    //log(err.stack);
+    return err;
   };
 };
 
+async function search(data) {
+  console.log(data.results);
+  await data.results.forEach(element => {
+    main(element.url);
+  });
 
-main('https://pokeapi.co/api/v2/_');
+}
+
+async function searchTillFound(offst, limit) {
+  const res = await nodeFetch(`https://pokeapi.co/api/v2/item/?offset=${offst}&limit=${limit}`);
+  let data = await res.json();
+  while (search(data)) {
+    const resInLoop = await nodeFetch(data.next);
+    data = await resInLoop.json();
+  }
+}
+searchTillFound(0, 10);
+
+//solution https://pokeapi.co/api/v2/item/23/
